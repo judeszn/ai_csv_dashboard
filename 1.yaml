@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  ai-dashboard:
+    build: .
+    environment:
+      - BACKEND_URL=http://localhost:8000
+    secrets:
+      - google_api_key
+    ports:
+      - "8000:8000"
+      - "8501:8501"
+
+secrets:
+  google_api_key:
+    file: ./secrets/google_api_key.txt

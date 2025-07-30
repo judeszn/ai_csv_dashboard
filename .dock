@@ -1,0 +1,23 @@
+# This file tells Docker which files and folders to ignore when building an image.
+
+## Git
+.git/
+
+## Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+## Virtual Environments
+venv/
+.venv/
+env/
+.env/
+
+## IDE / Editor settings
+.vscode/
+.idea/
+
+## Other
+.DS_Store

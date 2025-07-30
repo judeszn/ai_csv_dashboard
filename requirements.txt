@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]>=0.23.2,<0.30.0
+pandas
+python-dotenv
+langchain
+langchain-google-genai
+langchain-experimental
+google-generativeai
+tabulate
+streamlit

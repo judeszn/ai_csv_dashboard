@@ -1,0 +1,72 @@
+# ---- Stage 1: Build Stage ----
+# Use a full Python image that includes build tools to compile dependencies if needed.
+FROM python:3.10 AS builder
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Install system dependencies needed for the application
+# build-essential is for compiling python packages, poppler-utils is for PDF processing
+# This layer will be cached and only rebuilt if this command changes.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        poppler-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the requirements file first to leverage Docker's layer caching
+COPY requirements.txt ./
+
+# Install Python dependencies into a dedicated virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN pip install --no-cache-dir -r requirements.txt
+
+# ---- Stage 2: Final Stage ----
+# Start from a clean, slim image that doesn't contain the build tools.
+FROM python:3.10-slim
+WORKDIR /app
+
+# Copy the virtual environment from the builder stage
+COPY --from=builder /opt/venv /opt/venv
+
+# Copy only the necessary application code
+COPY backend ./backend
+COPY frontend ./frontend
+COPY start.sh ./
+
+# Activate the virtual environment
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Expose the ports for the backend (FastAPI) and frontend (Streamlit)
+EXPOSE 8000
+EXPOSE 8501
+
+# Make the startup script executable and run it
+RUN chmod +x ./start.sh
+CMD ["./start.sh"]
+
+
+new-analytics-project/
+├── backend/
+│   ├── __init__.py      (empty file)
+│   └── main.py
+├── frontend/
+│   └── app.py
+├── .gitignore           (Good practice to have)
+├── Dockerfile
+├── requirements.txt
+└── start.sh
+
+requirements.txt**
+fastapi
+uvicorn[standard]
+streamlit
+pandas
+google-generativeai
+python-dotenv
+requests
+
+**
+"GOOGLE_API_KEY" = "AIzaSyBPmZs0wk0rnUMYLAbu3Owlu3alK2UGopc"
+"GEMINI_MODEL" = "gemini-2.0-flash"
